@@ -1,10 +1,246 @@
-import http.server
 import json
-from DAO.Users_DAO import Users_DAO
-from DAO.Messages_DAO import Messages_DAO
-import sqlite3
+import http.server
+from Repository.UsersRepository import UsersRepository
+from Repository.MessagesRepository import MessagesRepository
+from service.MessageService import MessageService
+from service.UserService import UserService
 
-def split_query(query:str) -> dict:
+
+class RequestHandler(http.server.BaseHTTPRequestHandler):
+    messages_repository = MessagesRepository()
+    users_repository = UsersRepository()
+    messages_service = MessageService(messages_repository, users_repository)
+    user_service = UserService(messages_repository, users_repository)
+
+    def set_headers(self) -> None:
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', '*')
+        self.send_header('Access-Control-Allow-Headers', '*')
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+
+    def do_GET(self):
+        request_path: list = split_path(self.path)
+        path: list = request_path[0]
+        params: dict = request_path[1]
+        path = ['/' + p for p in path]
+        if path[0] == '/':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            with open('frontend/pages/home/index.html', 'rb') as file:
+                html = file.read()
+
+            self.wfile.write(html)
+        elif path[0] == '/index.css':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+
+            with open('frontend/pages/home/index.css', 'rb') as file:
+                css = file.read()
+            
+            self.wfile.write(css)
+        elif path[0] == '/index.js':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/javascript')
+            self.end_headers()
+
+            with open('frontend/pages/home/index.js', 'rb') as file:
+                js = file.read()
+            
+            self.wfile.write(js)
+        elif path[0] == '/login':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            with open('frontend/pages/login/login.html', 'rb') as file:
+                html = file.read()
+
+            self.wfile.write(html)
+        elif path[0] == '/login.css':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+
+            with open('frontend/pages/login/login.css', 'rb') as file:
+                css = file.read()
+            
+            self.wfile.write(css)
+        elif path[0] == '/login.js':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/javascript')
+            self.end_headers()
+
+            with open('frontend/pages/login/login.js', 'rb') as file:
+                js = file.read()
+            
+            self.wfile.write(js)    
+        elif path[0] == '/new_message':
+            if params is None:
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+
+                with open('frontend/pages/new_message/new_message.html', 'rb') as file:
+                    html = file.read()
+
+                self.wfile.write(html)
+            else:
+                self.send_error(404)
+        elif path[0] == '/new_message.css':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+
+            with open('frontend/pages/new_message/new_message.css', 'rb') as file:
+                css = file.read()
+            
+            self.wfile.write(css)
+        elif path[0] == '/new_message.js':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/javascript')
+            self.end_headers()
+
+            with open('frontend/pages/new_message/new_message.js', 'rb') as file:
+                js = file.read()
+            
+            self.wfile.write(js)
+        elif path[0] == '/message':
+            if len(path) == 1:
+                if params is None:
+                    messages = self.messages_service.get_messages()
+                    self.send_response(200)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(messages), 'utf-8'))
+                elif 'message_id' in params:
+                    message = self.messages_service.get_message(params['message_id'])
+                    if message is None:
+                        self.send_error(404, "Message not found")
+                    else:
+                        self.send_response(200)
+                        self.set_headers()
+                        self.wfile.write(bytes(json.dumps(message), 'utf-8'))
+                elif 'sender_email' in params:
+                    messages = self.messages_service.get_messages_by_sender_email(params['sender_email'])
+                    self.send_response(200)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(messages), 'utf-8'))
+                elif 'recipient_email' in params:
+                    messages = self.messages_service.get_messages_by_recipient_email(params['recipient_email'])
+                    self.send_response(200)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(messages), 'utf-8'))
+            elif len(path) == 2:
+                if path[1][1:].isdecimal():
+                    message = self.messages_service.get_message(path[1][1:])
+                    with open('frontend/pages/message/message.html', 'rb') as file:
+                        html = file.read()
+                    html = html.decode('utf-8')
+                    html = html.replace('<h2>From: <span id="sender-email"></span></h2>', f'<h2>From: <span id="sender-email">{message["sender_email"]}</span></h2>')
+                    html = html.replace('<h3>To: <span id="recipient-email"></span></h3>', f'<h2>To: <span id="recipient-email">{message["recipient_email"]}</span></h2>')
+                    html = html.replace('<h3>Subject: <span id="subject"></span></h3>', f'<h2>Subject: <span id="subject">{message["subject"]}</span></h2>')
+                    html = html.replace('<p id="body"></p>', f'<p id="body">{message["body"]}</p>')
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write(bytes(html, 'utf-8'))
+                elif path[1] == '/message.css':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/css')
+                    self.end_headers()
+
+                    with open('frontend/pages/message/message.css', 'rb') as file:
+                        css = file.read()
+                    
+                    self.wfile.write(css)
+                elif path[1] == '/message.js':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/javascript')
+                    self.end_headers()
+
+                    with open('frontend/pages/message/message.js', 'rb') as file:
+                        js = file.read()
+                    
+                    self.wfile.write(js)
+                else:
+                    self.send_error(404, "Message not found")
+        elif path[0] == '/user':
+            if params is None:
+                users = self.user_service.get_users()
+                self.send_response(200)
+                self.set_headers()
+                self.wfile.write(bytes(json.dumps(users), 'utf-8'))
+            elif 'user_id' in params:
+                user = self.user_service.get_user(params['user_id'])
+                if user is None:
+                    self.send_error(404, "User not found")
+                else:
+                    self.send_response(200)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(user), 'utf-8'))
+            elif 'email_address' in params:
+                user = self.user_service.get_user_by_email(params['email_address'])
+                if user is None:
+                    self.send_error(404, "User not found")
+                else:
+                    self.send_response(200)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(user), 'utf-8'))
+        else:
+            self.send_error(404, "Route unavailable")
+
+    def do_POST(self):
+        request_path: list = split_path(self.path)
+        path: list = request_path[0]
+        path = ['/' + p for p in path]
+        json_data: str = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
+        json_data: dict = json.loads(json_data)
+        if path[0] == '/user':
+            if 'name' and 'email_address' in json_data:
+                user = self.user_service.add_user(json_data['name'], json_data['email_address'])
+                if user is None:
+                    self.send_error(400, "User already exists")
+                else:
+                    self.send_response(201)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(user), 'utf-8'))
+        elif path[0] == '/message':
+            if 'sender_email' and 'recipient_email' and 'subject' and 'body' in json_data:
+                message = self.messages_service.send_message(json_data['sender_email'], json_data['recipient_email'], json_data['subject'], json_data['body'])
+                if message is None:
+                    self.send_error(404, "Sender or receiver not found")
+                else:
+                    self.send_response(201)
+                    self.set_headers()
+                    self.wfile.write(bytes(json.dumps(message), 'utf-8'))
+        else:
+            self.send_error(404, "Route unavailable")
+    
+    def do_DELETE(self):
+        request_path: list = split_path(self.path)
+        path: list = request_path[0]
+        params: dict = request_path[1]
+        path = ['/' + p for p in path]
+        if path[0] == '/':
+            pass
+        elif path[0] == '/message':
+            if 'message_id' in params:
+                self.messages_service.delete_message(params['message_id'])
+                self.send_response(204)
+                self.set_headers()
+                self.wfile.write(bytes("Message Deleted", 'utf-8'))
+        elif path[0] == '/user':
+            if 'user_id' in params:
+                self.user_controller.delete_user(self, params['user_id'])
+        else:
+            self.send_error(404, "Route unavailable")
+        
+
+
+def split_query(query: str) -> dict:
     query = query.split('&')
     query_dict = {}
     for item in query:
@@ -12,147 +248,13 @@ def split_query(query:str) -> dict:
         query_dict[item[0]] = item[1]
     return query_dict
 
-def split_path(path:str) -> list:
+
+def split_path(path: str) -> list:
     path = path.split('?')
+    path[0] = path[0][1:].split('/')
+
     if len(path) == 1:
         return [path[0], None]
     else:
         query = split_query(path[1])
         return [path[0], query]
-
-class RequestHandler(http.server.BaseHTTPRequestHandler):
-    messages_dao = Messages_DAO()
-    users_dao = Users_DAO()
-
-    def do_GET(self):
-        request_path = split_path(self.path)
-        path = request_path[0]
-        params = request_path[1]
-        if path == '/':
-            users = self.users_dao.get_all_users()
-            json_data = json.dumps(users)
-            print(users)
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(bytes(json_data, 'utf-8'))
-        elif path == '/message':
-            if params == None:
-                get_messages(self)
-            elif 'message_id' in params:
-                get_message(self, params['message_id'])
-            elif 'sender_id' in params:
-                get_messages_by_sender(self, params['sender_id'])
-            elif 'sender_email' in params:
-                get_messages_by_sender_email(self, params['sender_email'])
-        else:
-            self.send_error(404, "Route unavailable")
-    
-    def do_POST(self):
-        if self.path == '/':
-            with open('data.json', 'a') as f:
-                json_data = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
-                f.write(json_data)
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(bytes(json_data, 'utf-8'))
-        elif self.path == '/user':
-            json_data:str = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
-            json_data:dict = json.loads(json_data)
-            print(json_data['name'], json_data['email_address'])
-            self.users_dao.insert_user(json_data['name'], json_data['email_address'])
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            json_data = json.dumps(json_data)
-            self.wfile.write(bytes(json_data, 'utf-8'))
-        elif self.path == '/email':
-            json_data:str = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
-            json_data:dict = json.loads(json_data)
-            self.messages_dao.insert_message(json_data['sender_id'], json_data['recipient_id'], json_data['subject'], json_data['body'])
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            json_data = json.dumps(json_data)
-            self.wfile.write(bytes(json_data, 'utf-8'))
-        else:
-            self.send_error(404, "Route unavailable")
-
-def get_message(request:RequestHandler, message_id:int):
-    try:
-        message = request.messages_dao.get_message_by_id(message_id)
-        json_data = json.dumps(message)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")
-
-def get_messages(request:RequestHandler):
-    try:
-        messages = request.messages_dao.get_all_messages()
-        json_data = json.dumps(messages)
-        print(json_data)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")
-
-def get_messages_by_sender(request:RequestHandler, sender_id:int):
-    try:
-        messages = request.messages_dao.get_messages_by_sender(sender_id)
-        json_data = json.dumps(messages)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")
-
-def get_messages_by_sender_email(request:RequestHandler, sender_email:str):
-    try:
-        sender = request.users_dao.get_user_by_email(sender_email)
-        messages = request.messages_dao.get_messages_by_sender(sender[0])
-        json_data = json.dumps(messages)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(TypeError):
-        request.send_error(400, "Bad Request")
-
-def delete_message(request:RequestHandler, message_id:int):
-    try:
-        request.messages_dao.delete_message(message_id)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes("Message deleted", 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")
-
-def get_user(request:RequestHandler, user_email:str):
-    try:
-        user = request.users_dao.get_user_by_email(user_email)
-        json_data = json.dumps(user)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")
-
-def get_users(request:RequestHandler):
-    try:
-        users = request.users_dao.get_all_users()
-        json_data = json.dumps(users)
-        request.send_response(200)
-        request.send_header('Content-type', 'application/json')
-        request.end_headers()
-        request.wfile.write(bytes(json_data, 'utf-8'))
-    except(sqlite3.OperationalError, TypeError):
-        request.send_error(400, "Bad Request")

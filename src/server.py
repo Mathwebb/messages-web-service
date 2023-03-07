@@ -1,10 +1,10 @@
 import socketserver
-from DAO.Standard_DAO import StandardDAO
+from Repository.StandardRepository import StandardRepository
 from api import RequestHandler
 
 PORT = 8000
 
 with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
-    StandardDAO()
+    StandardRepository()
     print("serving at port", PORT)
     httpd.serve_forever()

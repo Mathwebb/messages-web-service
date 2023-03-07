@@ -1,6 +1,7 @@
-from DAO.Standard_DAO import StandardDAO
+from Repository.StandardRepository import StandardRepository
 
-class Users_DAO(StandardDAO):
+
+class UsersRepository(StandardRepository):
     def __init__(self):
         super().__init__()
 
@@ -16,7 +17,7 @@ class Users_DAO(StandardDAO):
                 """, (email_address,))
         return self.cursor.fetchone()
 
-    def get_all_users(self):
+    def get_users(self):
         self.cursor.execute("""
                 SELECT * FROM users
                 """)

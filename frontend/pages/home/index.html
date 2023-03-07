@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome, <span id="username"></span>!</h1>
+        <p><span id="email"></span></p>
+    </header>
+    <main>
+        <button onclick="location.href='new_message'">New Message</button><br><br>
+        <button onclick="location.href='login'">Exit</button><br><br>
+        <div id="message-list">
+            <ul id="sent-messages-list">
+                <h2>Sent messages</h2>
+            </ul>
+            <ul id="received-messages-list">
+                <h2>Received messages</h2>
+            </ul>
+        </div>
+    </main>
+    <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Message</title>
+    <link rel="stylesheet" href="message.css">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <button id="home-btn" onclick="returnHome()">Return to home</button>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <div class="message">
+          <h2>From: <span id="sender-email"></span></h2>
+          <h3>To: <span id="recipient-email"></span></h3>
+          <h3>Subject: <span id="subject"></span></h3>
+          <p id="body"></p>
+        </div>
+        <div class="actions">
+          <button id="reply-btn">Reply</button>
+          <button id="forward-btn">Forward</button>
+        </div>
+      </div>
+    </main>
+    <script src="message.js"></script>
+  </body>
+</html>

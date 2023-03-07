@@ -1,6 +1,7 @@
-from DAO.Standard_DAO import StandardDAO
+from Repository.StandardRepository import StandardRepository
 
-class Messages_DAO(StandardDAO):
+
+class MessagesRepository(StandardRepository):
     def __init__(self):
         super().__init__()
 
@@ -10,7 +11,7 @@ class Messages_DAO(StandardDAO):
                 """, (message_id,))
         return self.cursor.fetchone()
 
-    def get_all_messages(self):
+    def get_messages(self):
         self.cursor.execute("""
                 SELECT * FROM messages
                 """)
@@ -20,6 +21,12 @@ class Messages_DAO(StandardDAO):
         self.cursor.execute("""
                 SELECT * FROM messages WHERE sender_id = ?
                 """, (sender_id,))
+        return self.cursor.fetchall()
+    
+    def get_messages_by_recipient(self, recipient_id):
+        self.cursor.execute("""
+                SELECT * FROM messages WHERE recipient_id = ?
+                """, (recipient_id,))
         return self.cursor.fetchall()
 
     def insert_message(self, sender_id, recipient_id, subject, body):

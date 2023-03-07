@@ -1,6 +1,6 @@
 import sqlite3
 
-class StandardDAO:
+class StandardRepository:
     sqlite_file = 'mydb.sqlite'
     conn = None
     cursor = None
