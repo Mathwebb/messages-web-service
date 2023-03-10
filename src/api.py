@@ -167,6 +167,66 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     self.wfile.write(js)
                 else:
                     self.send_error(404, "Message not found")
+            elif len(path) == 3:
+                if path[1][1:].isdigit():
+                    if path[2] == '/forward':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/html')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/forward/forward.html', 'rb') as file:
+                            html = file.read()
+
+                        self.wfile.write(html)
+                    elif path[2] == '/forward.css':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/css')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/forward/forward.css', 'rb') as file:
+                            css = file.read()
+                        
+                        self.wfile.write(css)
+                    elif path[2] == '/forward.js':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/javascript')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/forward/forward.js', 'rb') as file:
+                            js = file.read()
+                        
+                        self.wfile.write(js)
+                    elif path[2] == '/reply':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/html')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/reply/reply.html', 'rb') as file:
+                            html = file.read()
+
+                        self.wfile.write(html)
+                    elif path[2] == '/reply.css':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/css')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/reply/reply.css', 'rb') as file:
+                            css = file.read()
+                        
+                        self.wfile.write(css)
+                    elif path[2] == '/reply.js':
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/javascript')
+                        self.end_headers()
+
+                        with open('frontend/pages/message/reply/reply.js', 'rb') as file:
+                            js = file.read()
+                        
+                        self.wfile.write(js)
+                    else:
+                        self.send_error(404, "Message not found")
+                else:
+                    self.send_error(404, "Message not found")
         elif path[0] == '/user':
             if params is None:
                 users = self.user_service.get_users()
