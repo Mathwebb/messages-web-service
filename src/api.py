@@ -77,7 +77,34 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             with open('frontend/pages/login/login.js', 'rb') as file:
                 js = file.read()
             
-            self.wfile.write(js)    
+            self.wfile.write(js)
+        elif path[0] == '/register':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            with open('frontend/pages/register/register.html', 'rb') as file:
+                html = file.read()
+
+            self.wfile.write(html)
+        elif path[0] == '/register.css':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+
+            with open('frontend/pages/register/register.css', 'rb') as file:
+                css = file.read()
+            
+            self.wfile.write(css)
+        elif path[0] == '/register.js':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/javascript')
+            self.end_headers()
+
+            with open('frontend/pages/register/register.js', 'rb') as file:
+                js = file.read()
+            
+            self.wfile.write(js)
         elif path[0] == '/new_message':
             if params is None:
                 self.send_response(200)

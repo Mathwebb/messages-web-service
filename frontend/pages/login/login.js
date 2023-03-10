@@ -14,10 +14,16 @@ form.addEventListener('submit', event => {
                 window.location.href = 'http://localhost:8000/';
             });
         } else {
+            alert('Invalid email')
             throw new Error('Unable to login');
         }
     })
     .catch(error => {
+        alert('Invalid email')
         console.error(error);
     });
 });
+
+function signupRedirect() {
+    window.location.href = 'http://localhost:8000/register';
+}
