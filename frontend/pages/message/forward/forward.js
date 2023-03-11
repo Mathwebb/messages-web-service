@@ -1,4 +1,5 @@
 message_id = window.location.href.split('/')[4];
+const user_email = JSON.parse(sessionStorage.getItem('user')).email;
 
 function returnHome() {
     window.location.href = '/';
@@ -12,7 +13,7 @@ fetch('/message?message_id=' + message_id, {
 }).then(response => {
     if (response.ok) {
         response.json().then(data => {
-            document.getElementById('sender-email').value = data.sender_email;
+            document.getElementById('sender-email').value = user_email;
             document.getElementById('subject').value = data.subject;
             document.getElementById('body').value = data.body;
         });
@@ -25,12 +26,12 @@ fetch('/message?message_id=' + message_id, {
     console.error(error);
 });
 
-const form = document.getElementById('reply-form');
+const form = document.getElementById('forward-form');
 
 form.addEventListener('submit', event => {
     event.preventDefault();
 
-    const formData = new FormData(document.getElementById('reply-form'));
+    const formData = new FormData(document.getElementById('forward-form'));
 
     fetch('/message', {
         method: 'POST',
@@ -47,11 +48,11 @@ form.addEventListener('submit', event => {
         if (response.ok) {
             window.location.href = '/message/' + message_id;
         } else {
-            alert('Unable to send reply');
-            throw new Error('Unable to send reply');
+            alert('Unable forward message');
+            throw new Error('Unable forward message');
         }
     }).catch(error => {
-        alert('Unable to send reply');
+        alert('Unable forward message');
         console.error(error);
     });
 });
