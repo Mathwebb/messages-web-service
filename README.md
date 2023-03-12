@@ -10,7 +10,7 @@ A API do backend que permite a integração com o frontend utiliza arquivos JSON
   - /message?recipient_email=example@example.com - retorna todas as mensagens recebidas por um determinado usuário que possui o endereço de email informado, nesse caso example@example.com;
   - /user - retorna todos os usuários cadastrados no sistema;
   - /user?user_id=3 - retorna o usuário cujo id é igual ao id informado na requisição;
-  - /user?email_adress=example@example.com - retorna o usuário cujo endereço de email é igual ao endereço de email informado na requisição;
+  - /user?email_address=example@example.com - retorna o usuário cujo endereço de email é igual ao endereço de email informado na requisição;
 - POST
   - /user - cadastra um novo usuário no sistema, o corpo da requisição deve ser um JSON no seguinte formato:
  
@@ -55,7 +55,7 @@ The backend API that allows integration with the frontend uses JSON files for co
   - /message?recipient_email=example@example.com - returns all messages received by a specific user with the email address provided, in this case example@example.com;
   - /user - returns all users registered in the system;
   - /user?user_id=3 - returns the user whose id is equal to the id provided in the request;
-  - /user?email_adress=example@example.com - returns the user whose email address is equal to the email address provided in the request;
+  - /user?email_address=example@example.com - returns the user whose email address is equal to the email address provided in the request;
 - POST
   - /user - registers a new user in the system, the request body must be a JSON in the following format:
 
