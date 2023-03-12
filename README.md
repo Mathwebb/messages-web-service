@@ -1,7 +1,7 @@
 # messages-web-service
 Small Resftull web application made as a practical work in the distributed systems class. The objective was to avoid the use of frameworks that improve the level of abstraction, instead several low level libraries were used to develop this project.
 
-## API endpoints (English)
+## API endpoints
 The backend API that allows integration with the frontend uses JSON files for communication and has the following endpoints that follow these formats:
 
 - GET
