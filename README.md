@@ -32,7 +32,9 @@ A API do backend que permite a integração com o frontend utiliza arquivos JSON
 
 ## Como usar
 Para usar o aplicativo, você precisa clonar o repositório do GitHub usando o seguinte comando:
-- git clone https://github.com/Mathwebb/messages-web-service.git
+```
+git clone https://github.com/Mathwebb/messages-web-service.git
+```
 
 O aplicativo usa as seguintes bibliotecas, todas estão incluídas na biblioteca padrão do Python, portanto, não é necessário instalar nenhuma delas:
 - http.server
@@ -60,16 +62,16 @@ The backend API that allows integration with the frontend uses JSON files for co
   - /user - registers a new user in the system, the request body must be a JSON in the following format:
 
         {
-        'name': 'username',
-        'email_address': 'example@example.com'
+        "name": "username",
+        "email_address": "example@example.com"
         }
   - /message - sends a new message to some user in the system, the request body must be a JSON in the following format:
 
         {
-          'sender_email': 'sender@email.com',
-          'recipient_email': 'recipient@email.com',
-          'subject': 'Meeting at the park',
-          'body': 'I went to the park yesterday, did not find you there.'
+          "sender_email": 'sender@email.com",
+          "recipient_email": 'recipient@email.com",
+          "subject": "Meeting at the park",
+          "body": "I went to the park yesterday, did not find you there."
         }
 
 - DELETE
@@ -78,7 +80,10 @@ The backend API that allows integration with the frontend uses JSON files for co
 
 ## How to use
 To use the application you need to clone the github repository using the following command:
-- git clone https://github.com/Mathwebb/messages-web-service.git
+
+```
+git clone https://github.com/Mathwebb/messages-web-service.git
+```
 
 The application uses the following libraries, all of the following libraries are included in the default python library, so there's no need to install any of the libraries:
 - http.server
